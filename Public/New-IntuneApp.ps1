@@ -154,7 +154,7 @@ function New-IntuneApp {
         [string]$RegKeyValueName,
 
         # RegKeyVersionValue - the version value that appears in the registry on the client machine (will be used for detection)
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $false)]
         [string]$RegKeyVersionValue,
 
         # IconPath - path to icon image file
@@ -225,6 +225,8 @@ function New-IntuneApp {
         [string]$AppVersion = $RegKeyVersionValue
     )
 
+    $ErrorActionPreference = "Stop"
+
     # package folder containing installer files as .intunewin file
     $intuneWinPath = New-IntuneAppPackage -InstallerPath $SourcePath
 
@@ -255,6 +257,13 @@ function New-IntuneApp {
             VersionComparisonValue      = $RegKeyVersionValue
             VersionComparison           = $true
             VersionComparisonOperator   = "greaterThanOrEqual"
+        }
+    } elseif (-not $RegKeyVersionValue) {
+        $newDetRuleRegArgs = @{
+            KeyPath                     = $RegKeyPath
+            ValueName                   = $RegKeyValueName
+            Existence                   = $true
+            DetectionType               = "exists"
         }
     } else {
         $newDetRuleRegArgs = @{
@@ -343,7 +352,8 @@ function New-IntuneApp {
     }
 
     if ($PSCmdlet.ShouldProcess($DisplayName, "Adding this app to Intune.")) {
-        Add-IntuneWin32App @addIntuneWin32AppArgs
+        $publishedApp = Add-IntuneWin32App @addIntuneWin32AppArgs
+        Write-Output $publishedApp.id
     }
 
     Write-Output $intuneWinPath

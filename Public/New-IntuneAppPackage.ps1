@@ -26,7 +26,7 @@
 
         if ($PSCmdlet.ShouldProcess("$sourceFolder", "Compressing $sourceFolder into $outputFolder\$setupFileNoExtension.intunewin")) {
             try {
-                New-IntuneWin32AppPackage -SourceFolder $sourceFolder -SetupFile $setupFile -OutputFolder $outputFolder
+                $null = New-IntuneWin32AppPackage -SourceFolder $sourceFolder -SetupFile $setupFile -OutputFolder $outputFolder
                 Write-Verbose "Intune package exists at: $outputFolder\$setupFileNoExtension.intunewin"
                 return "$outputFolder\$setupFileNoExtension.intunewin"
             } catch {
